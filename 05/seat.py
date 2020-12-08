@@ -16,13 +16,6 @@ def parse_data(fp):
     return seats
 
 
-def set_logging(loglevel="INFO"):
-    numeric_level = getattr(logging, loglevel.upper(), None)
-    if not isinstance(numeric_level, int):
-        raise ValueError('Invalid log level: %s' % loglevel)
-    logging.basicConfig(level=numeric_level, format='%(asctime)s %(levelname)s %(message)s')
-
-
 def print_max(seats):
     logging.info("Max: %s", max(seats))
 
