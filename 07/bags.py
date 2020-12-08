@@ -14,9 +14,9 @@ def parse_rule(G, rule_str, my_bag):
     parts = rule_str.rstrip('.').split('contain ')
     words = parts[0].split(' ')
     holder_id = ' '.join(words[0:2])
-    # skip what own bag can contain
-    if holder_id == my_bag:
-        return
+    # # skip what own bag can contain
+    # if holder_id == my_bag:
+    #     return
     G.add_node(holder_id)
 
     logging.debug("Holder bag: '%s'", holder_id)
@@ -40,6 +40,16 @@ def parse_data(G, fp, my_bag):
         logging.debug("Parsing: %s", line)
         parse_rule(G, line, my_bag)
     return
+
+
+def count_containing_bags(G, node, depth=0):
+    count = 1
+    depth += 1
+    for neighbor in G.predecessors(node):
+        weight = G[neighbor][node]["weight"]
+        num = count_containing_bags(G, neighbor, depth)
+        count += num * weight
+    return count
 
 
 def fetch_connected_nodes(G, node, seen=None, depth=0):
@@ -113,6 +123,9 @@ def main(args):
 
     # use recurse count
     logging.info("Recursive count %d", do_count(G, my_bag))
+
+    # bag counting
+    logging.info("My bag contains %s bags", count_containing_bags(G, my_bag) - 1)
     if args.plot:
         plot(G)
 
