@@ -12,7 +12,8 @@ def parse_rule(G, rule_str, my_bag):
     # vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
     # faded blue bags contain no other bags.
     parts = rule_str.rstrip('.').split('contain ')
-    holder_id = parts[0].rstrip(' bags')
+    words = parts[0].split(' ')
+    holder_id = ' '.join(words[0:2])
     # skip what own bag can contain
     if holder_id == my_bag:
         return
