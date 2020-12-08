@@ -8,13 +8,13 @@ import logging
 import networkx as nx
 
 
-def parse_rule(G, rule_str):
+def parse_rule(G, rule_str, my_bag):
     # vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
     # faded blue bags contain no other bags.
     parts = rule_str.rstrip('.').split('contain ')
     holder_id = parts[0].rstrip(' bags')
     # skip what own bag can contain
-    if holder_id == 'shiny gold':
+    if holder_id == my_bag:
         return
     G.add_node(holder_id)
 
@@ -30,32 +30,54 @@ def parse_rule(G, rule_str):
             logging.debug("* holds %d of '%s'", num, bag_id)
 
 
-def parse_data(G, fp):
+def parse_data(G, fp, my_bag):
     fp.seek(0, 0)
     while line := fp.readline():
         line = line.strip()
         if line == "":
             continue
         logging.debug("Parsing: %s", line)
-        parse_rule(G, line)
+        parse_rule(G, line, my_bag)
     return
 
 
-def fetch_connected_nodes(G, node, seen=None, level=0):
+def fetch_connected_nodes(G, node, seen=None, depth=0):
     if seen == None:
         seen = set([node])
         # print(node)
 
-    level += 1
+    depth += 1
     for neighbor in G.neighbors(node):
         if neighbor not in seen:
             seen.add(neighbor)
-            #print(' ' + '*'*level + ' ' + neighbor)
-            fetch_connected_nodes(G, neighbor, seen, level)
+            #print(' ' + '*'*depth + ' ' + neighbor)
+            fetch_connected_nodes(G, neighbor, seen, depth)
     return seen
 
 
+def do_count(G, my_bag):
+    count = 0
+    for node in G.nodes():
+        #print("* " + node)
+        if contains_bag(G, node, my_bag):
+            count += 1
+    return count
+
+
+def contains_bag(G, bag, my_bag):
+
+    for neighbor in G.predecessors(bag):
+        #print(bag + '>' + neighbor)
+
+        if neighbor == my_bag:
+            return True
+        if contains_bag(G, neighbor, my_bag):
+            return True
+    return False
+
+
 def plot(G):
+    # pip install matplotlib
     import matplotlib.pyplot as plt
 
     pos = nx.nx_agraph.graphviz_layout(G)
@@ -69,23 +91,27 @@ def plot(G):
 
 
 def main(args):
+    my_bag = 'shiny gold'
 
     G = nx.DiGraph(format='weighted_adjacency_matrix')
-    parse_data(G, args.data)
+    parse_data(G, args.data, my_bag)
 
-    my_bag = 'shiny gold'
     logging.info("My bag: %s", my_bag)
     logging.info("Number of nodes %d, edges %d", G.number_of_nodes(), G.number_of_edges())
 
+    # use nx breath first search
     bt = nx.bfs_tree(G, my_bag, reverse=False)
     edges = list(bt.edges())
     logging.debug("BFS: %s", edges)
     logging.info("BFS: Numer bags can hold my bag is: %d", len(edges))
 
+    # use custom search
     connected = fetch_connected_nodes(G, my_bag)
     logging.debug("Connected: %s", connected)
     logging.info("Connected: Numer bags can hold my bag is: %d", len(connected) - 1)
 
+    # use recurse count
+    logging.info("Recursive count %d", do_count(G, my_bag))
     if args.plot:
         plot(G)
 
