@@ -15,18 +15,21 @@ DATA = {
 }
 
 
-def find_bus(d='test'):
-    t = DATA[d]['time']
-    min = 10000
-    for bus in DATA[d]['busses']:
+def find_bus(busses, t):
+    min_wait = max(busses)
+    for bus in busses:
         if bus == 1:
             continue
         w = wait_time(t, bus)
-        if w < min:
-            min = w
+        if w < min_wait:
+            min_wait = w
             best = bus
         logging.debug('%d: %d mod %d, wait: %d', bus, int(t/bus), t % bus, w)
     return best
+
+
+def wait_time(x, y):
+    return ((int(x / y) + 1)*y) - x
 
 
 def solve_brute(r):
@@ -77,14 +80,10 @@ def reduce_to_one(t1, t2):
             return (n*m - k, n*m)
 
 
-def wait_time(x, y):
-    return ((int(x / y) + 1)*y) - x
-
-
 def main(args):
     d = 'test'
-    best = find_bus(d)
-    logging.info("%s: best bus: %d, wait at %d => %d",
+    best = find_bus(DATA[d]['busses'], DATA[d]['time'])
+    logging.info("%s: best bus: %d, wait for %d => %d",
                  d, best, wait_time(DATA[d]['time'], best), best * wait_time(DATA[d]['time'], best))
 
     r = DATA[d]['busses']
@@ -93,8 +92,8 @@ def main(args):
     logging.info("Solved: %d", solve(DATA[d]['busses']))
 
     d = 'prod'
-    best = find_bus(d)
-    logging.info("%s: best bus: %d, wait at %d => %d",
+    best = find_bus(DATA[d]['busses'], DATA[d]['time'])
+    logging.info("%s: best bus: %d, wait for %d => %d",
                  d, best, wait_time(DATA[d]['time'], best), best * wait_time(DATA[d]['time'], best))
 
     # no chance! => logging.info("Brute force: %d",  solve_brute(r))
