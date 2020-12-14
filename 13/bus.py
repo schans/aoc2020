@@ -80,6 +80,19 @@ def reduce_to_one(t1, t2):
             return (n*m - k, n*m)
 
 
+def solvev2(r):
+    n = 0
+    step = 1
+    for i in range(0, len(r)):
+        if r[i] < 2:
+            continue
+        while (n + i) % r[i] != 0:
+            n += step
+        step *= r[i]
+        logging.debug("i:%d, r:%d, n:%d, step:%d", i, r[i], n, step)
+    return n
+
+
 def main(args):
     d = 'test'
     best = find_bus(DATA[d]['busses'], DATA[d]['time'])
@@ -89,7 +102,8 @@ def main(args):
     r = DATA[d]['busses']
     logging.debug("Busses: %s", r)
     logging.info("Brute force: %d",  solve_brute(r))
-    logging.info("Solved: %d", solve(DATA[d]['busses']))
+    logging.info("Solved v1: %d", solve(DATA[d]['busses']))
+    logging.info("Solved v2: %d", solvev2(DATA[d]['busses']))
 
     d = 'prod'
     best = find_bus(DATA[d]['busses'], DATA[d]['time'])
@@ -97,7 +111,8 @@ def main(args):
                  d, best, wait_time(DATA[d]['time'], best), best * wait_time(DATA[d]['time'], best))
 
     # no chance! => logging.info("Brute force: %d",  solve_brute(r))
-    logging.info("Solved: %d", solve(DATA[d]['busses']))
+    logging.info("Solved v1: %d", solve(DATA[d]['busses']))
+    logging.info("Solved v2: %d", solvev2(DATA[d]['busses']))
 
 
 def parse_args():
