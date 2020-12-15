@@ -3,8 +3,6 @@
 import argparse
 import logging
 
-from math import pow
-
 
 def parse_instruction(line):
     (opcode, val) = line.strip().split(' = ')
