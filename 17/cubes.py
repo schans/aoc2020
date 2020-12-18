@@ -7,14 +7,10 @@ import logging
 def parse_data(fp):
     cubes = set()
     fp.seek(0, 0)
-    x = 0
-    while line := fp.readline():
-        y = 0
-        for _, c in enumerate(line):
+    for x, line in enumerate(fp.readlines()):
+        for y, c in enumerate(line):
             if c == '#':
                 cubes.add((x, y, 0, 0))
-            y += 1
-        x += 1
     return cubes
 
 
