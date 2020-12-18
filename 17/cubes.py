@@ -3,10 +3,6 @@
 import argparse
 import logging
 
-import numpy as np
-from pprint import pprint
-
-dim = 15
 
 def parse_data(fp):
     cubes = set()
@@ -16,53 +12,65 @@ def parse_data(fp):
         y = 0
         for _, c in enumerate(line):
             if c == '#':
-                cubes.add((x, y , 0, 0))
+                cubes.add((x, y, 0, 0))
             y += 1
-        x +=1 
+        x += 1
     return cubes
 
-def pertubate(cubes, zdim=0):
+
+def get_range(cubes, i, d4=False):
+    if not d4 and i == 3:
+        return [0]
+    low = min(c[i] for c in cubes)
+    high = max(c[i] for c in cubes)
+    # extend box with one
+    return range(low-1, high+2)
+
+
+def pertubate(cubes, d4=False):
+    # pre-calc bounding box ranges
+    ranges = list()
+    for i in range(0, 4):
+        ranges.append(get_range(cubes, i, d4))
+
     new_cubes = set()
-    for x in range(-1*dim, dim):
-        for y in range(-1*dim, dim):
-            for z in range(-1*dim, dim):
-                for w in range(-1*zdim, zdim+1):
+    for x in ranges[0]:
+        for y in ranges[1]:
+            for z in ranges[2]:
+                for w in ranges[3]:
                     nb = 0
-                    for dx in [-1, 0 ,1]:
-                        for dy in [-1, 0 ,1]:
-                            for dz in [-1, 0 ,1]:
-                                for dw in [-1, 0 ,1]:
-                                    if dx!=0 or dy!=0 or dz!=0 or dw!=0:
+                    for dx in [-1, 0, 1]:
+                        for dy in [-1, 0, 1]:
+                            for dz in [-1, 0, 1]:
+                                for dw in [-1, 0, 1]:
+                                    if dx != 0 or dy != 0 or dz != 0 or dw != 0:
                                         if (x+dx, y+dy, z+dz, w+dw) in cubes:
-                                            nb+=1
-                    # print(x, y, z, w)
-                    if (x,y,z,w) in cubes:
+                                            nb += 1
+                    if (x, y, z, w) in cubes:
                         if nb == 2 or nb == 3:
-                            # print("add", x, y, z, w)
-                            new_cubes.add((x,y,z,w))
+                            new_cubes.add((x, y, z, w))
                     else:
                         if nb == 3:
-                            # print("add", x, y, z,w)
-                            new_cubes.add((x,y,z, w))
-                    
+                            new_cubes.add((x, y, z, w))
+
     return new_cubes
 
 
-def print_z(cubes, z, w=0):
-    for c in cubes:
-        if c[2] == z and c[3] == w:
-            print(c)
+def solve(cubes, nstep, d4=False):
+    for i in range(nstep):
+        cubes = pertubate(cubes, d4)
+        logging.debug("After step %d, num cubes: %d", i, len(cubes))
+    return len(cubes)
 
 
 def main(args):
-    nstep = args.nstep
     cubes = parse_data(args.data)
-    print(cubes)
+    logging.info("Starting cubes %s", cubes)
+    answer = solve(cubes, args.nstep, )
+    logging.info("Number of cubes after %d step is in 3d: %d", args.nstep, answer)
 
-    for _ in range(nstep):
-        cubes = pertubate(cubes, 15)
-        print_z(cubes,0)
-        print(len(cubes))
+    answer = solve(cubes, args.nstep, True)
+    logging.info("Number of cubes after %d step is in 4d: %d", args.nstep, answer)
 
 
 def parse_args():
