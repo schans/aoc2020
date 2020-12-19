@@ -76,7 +76,7 @@ def get_expr(rules, idx):
             b = get_expr(rules, int(looped[2]))
             # couple of iterations.. up until number no longer changes
             expanded = '((' + a + b + ')'
-            for k in range(2, 10):
+            for k in range(2, 8):
                 expanded += '|(' + a + '{'+str(k)+'}' + b + '{'+str(k)+'}' + ')'
             expanded += ')'
             return expanded
