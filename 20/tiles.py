@@ -62,7 +62,7 @@ def parse_data(fp):
         # while line := fp.readline():
         #     line = line.strip()
         if line == "":
-            tiles.append(Tile(n, np.array(t)))
+            tiles.append(Tile(n, np.array(t, np.int8)))
             t = list()
             continue
 
