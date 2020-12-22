@@ -81,18 +81,6 @@ def recurse(decks):
     return
 
 
-def find_safe(rcpts, alrgs):
-    all_ingrs = set()
-    for r in rcpts:
-        all_ingrs |= r['ingrs']
-
-    unsafe = set()
-    for a in alrgs:
-        unsafe |= alrgs[a]
-
-    return all_ingrs - unsafe
-
-
 def main(args):
     decks = parse_data(args.data)
     logging.info("Found %d decks with %d cards per deck!", len(decks), len(decks[0]))
