@@ -146,13 +146,11 @@ def do_move(h, move):
     logging.debug('pick up [%d,%d,%d]',  c1.l, c2.l, c3.l)
 
     d = h.l - 1
-    d %= SIZE
     if d == 0:
         d = SIZE
 
     while d in [c1.l, c2.l, c3.l]:
         d -= 1
-        d %= SIZE
         if d == 0:
             d = SIZE
 
