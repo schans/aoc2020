@@ -11,6 +11,7 @@ class Tile(object):
         self.black = False  # start white
         self.black_next = False  # next day color
         self.coord = coord  # (x,y)
+
         # neighbors
         self.n = {
             (2, 0): None,  # e
@@ -125,15 +126,17 @@ def flip(dirs, ref):
 
 
 def pop_grid():
-    # fill in the grid, could be optimized for min/max
-    odds = 19
-    evens = 20
-    for x in range(-1 * evens, evens, 2):
-        for y in range(-1 * evens, evens, 2):
+    # fill in the grid
+    maxx = max([abs(d[0]) for d in C.keys()])
+    maxy = max([abs(d[1]) for d in C.keys()])
+    maxx += maxx % 2 + 2
+    maxy += maxy % 2 + 2
+    for x in range(-1 * maxx, maxx, 2):
+        for y in range(-1 * maxy, maxy, 2):
             Tile.add(x, y)
 
-    for x in range(-1 * odds, odds, 2):
-        for y in range(-1 * odds, odds, 2):
+    for x in range(-1 * maxx - 1, maxx, 2):
+        for y in range(-1 * maxy - 1, maxy, 2):
             Tile.add(x, y)
 
 
@@ -141,7 +144,7 @@ def days(num_days):
     pop_grid()
     for d in range(0, num_days):
 
-        # # populate neighbors for black nodes
+        # populate neighbors for black nodes
         coords = list(C.keys())
         for coord in coords:
             # if C[coord].black:
