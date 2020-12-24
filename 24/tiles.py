@@ -11,7 +11,6 @@ class Tile(object):
         self.black = False  # start white
         self.black_next = False  # next day color
         self.coord = coord  # (x,y)
-
         # neighbors
         self.n = {
             (2, 0): None,  # e
@@ -21,25 +20,27 @@ class Tile(object):
             (-1, 1): None,  # nw
             (1, 1): None  # ne
         }
+        self.link()
+
+    def link(self):
+        for d in self.n:
+            x = self.coord[0]+d[0]
+            y = self.coord[1]+d[1]
+            if (x, y) in C:
+                self.n[d] = C[(x, y)]
 
     def flip(self):
         self.black = not self.black
 
     def get_neighbor(self, d):
         if not self.n[d]:
-            x = self.coord[0]+d[0]
-            y = self.coord[1]+d[1]
-            if (x, y) in C:
-                self.n[d] = C[(x, y)]
-            else:
-                self.n[d] = Tile((x, y))
-                C[(x, y)] = self.n[d]
-
+            t = Tile.add(self.coord[0]+d[0], self.coord[1]+d[1])
+            self.n[d] = t
         return self.n[d]
 
     def nb_populate(self):
-        for c in self.n:
-            self.get_neighbor(c)
+        for d in self.n:
+            self.get_neighbor(d)
 
     def nb_count(self):
         c = 0
@@ -48,17 +49,23 @@ class Tile(object):
                 c += 1
         return c
 
+    def dump(self):
+        print(self)
+        for d in self.n:
+            print('-', d, self.n[d])
+
     @staticmethod
     def add(x, y):
         if (x, y) in C:
             return
-        t = Tile((x, y))
+        t = Tile((x, y))  # links forward
         C[(x, y)] = t
+
+        # back link
         for d in t.n:
-            x = t.coord[0]+d[0]
-            y = t.coord[1]+d[1]
-            if (x, y) in C:
-                t.n[d] = C[(x, y)]
+            if t.n[d]:
+                t.n[d].link()
+        return t
 
     def __repr__(self):
         return 'Tile({})'.format(self.coord)
@@ -108,7 +115,7 @@ def parse_data(fp):
 
 def flip_all(rules):
     # initial white tile
-    ref = Tile((0, 0))
+    ref = Tile.add(0, 0)
     C[(0, 0)] = ref
     for dirs in rules:
         flip(dirs, ref)
@@ -125,30 +132,14 @@ def flip(dirs, ref):
     n.flip()
 
 
-def pop_grid():
-    # fill in the grid
-    maxx = max([abs(d[0]) for d in C.keys()])
-    maxy = max([abs(d[1]) for d in C.keys()])
-    maxx += maxx % 2 + 2
-    maxy += maxy % 2 + 2
-    for x in range(-1 * maxx, maxx, 2):
-        for y in range(-1 * maxy, maxy, 2):
-            Tile.add(x, y)
-
-    for x in range(-1 * maxx - 1, maxx, 2):
-        for y in range(-1 * maxy - 1, maxy, 2):
-            Tile.add(x, y)
-
-
 def days(num_days):
-    pop_grid()
     for d in range(0, num_days):
 
         # populate neighbors for black nodes
         coords = list(C.keys())
         for coord in coords:
-            # if C[coord].black:
-            C[coord].nb_populate()
+            if C[coord].black:
+                C[coord].nb_populate()
 
         # flippery
         for t in C.values():
@@ -162,7 +153,7 @@ def days(num_days):
         for t in C.values():
             t.black = t.black_next
 
-        logging.info("Black tiles after %d days: %d", d+1, count_black())
+        logging.info("Black tiles(%d) after %d days: %d", len(C), d+1, count_black())
 
 
 def count_black():
@@ -178,7 +169,7 @@ def main(args):
     logging.info("Found %d rules!", len(rules))
     flip_all(rules)
     logging.info("Black tiles after rules: %d", count_black())
-    days(100)
+    days(args.days)
 
 
 def parse_args():
@@ -186,6 +177,7 @@ def parse_args():
     parser.add_argument('-l', '--log', help="Log level",
                         choices=['debug', 'info', 'warn', 'error'], default='info')
     parser.add_argument('data', help="input data file", type=argparse.FileType('r'))
+    parser.add_argument('days', help="amount of days", type=int, default=100)
     return parser.parse_args()
 
 
