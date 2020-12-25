@@ -81,12 +81,12 @@ def is_valid_passport(pp) -> bool:
 
 
 def print_valid_count(passports):
-    sum = 0
+    cnt = 0
     for pp in passports:
         if is_valid_passport(pp):
-            sum += 1
+            cnt += 1
 
-    logging.info("Sum: %d", sum)
+    logging.info("Sum: %d", cnt)
 
 
 def print_missing(seats):
