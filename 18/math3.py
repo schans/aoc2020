@@ -3,6 +3,11 @@
 import fileinput
 
 
+# remap for precedence, overload to map back
+# equal: + => *, * => /
+# reverse: + => *, * => +
+
+
 class MyNum:
     """ map sub to mul """
 
@@ -20,29 +25,21 @@ class MyNum:
         return MyNum(self.n * x.n)
 
 
-# remap for precedence, overload to map back
-# equal: + => *, * => /
-# reverse: + =>v*, * => +
+remaps = [
+    {'+': '*', '*': '/'},
+    {'+': '*', '*': '+'}
+]
 
-t1 = 0
-t2 = 0
-for line in fileinput.input():
-    s1 = ""  # equal: + => *, * => /
-    s2 = ""  # reverse: + =>v*, * => +
-    for _, c in enumerate(line.strip()):
-        if c in "01234567890":
-            s1 += "MyNum(" + c + ")"
-            s2 += "MyNum(" + c + ")"
-        elif c == '*':
-            # abuse minus for equal operator precendence
-            s1 += '/'
-            s2 += '+'
-        elif c == '+':
-            s1 += '*'
-            s2 += '*'
-        else:
-            s1 += c
-            s2 += c
-    t1 += eval(s1).n
-    t2 += eval(s2).n
-print(t1, t2)
+for rm in remaps:
+    tot = 0
+    for line in fileinput.input():
+        s = ""
+        for _, c in enumerate(line.strip()):
+            if c in "01234567890":
+                s += "MyNum(" + c + ")"
+            elif c in rm:
+                s += rm[c]
+            else:
+                s += c
+        tot += eval(s).n
+    print(tot)
