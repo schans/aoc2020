@@ -10,8 +10,7 @@ for line in fileinput.input():
         v1 = n
     for m in N:
         if 2020 - n - m in N:
-            v2 = n
-            v3 = m
+            v2, v3 = n, m
 
 print(v1*(2020-v1))
 print(v2*v3*(2020-v2-v3))
