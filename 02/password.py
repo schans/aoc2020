@@ -4,12 +4,6 @@ import argparse
 import logging
 
 
-def parse_seat(seat_str):
-    seat_bin = seat_str.strip().replace('F', '0').replace('B', '1').replace('L', '0').replace('R', '1')
-    logging.debug("Seat %s, %s, %s", seat_str.strip(), seat_bin, int(seat_bin, 2))
-    return int(seat_bin, 2)
-
-
 def parse_data(fp) -> list:
     pwdata = list()
 
@@ -38,7 +32,6 @@ def is_valid_entry1(entry) -> bool:
 
 
 def is_valid_entry2(entry) -> bool:
-
     return (entry['passwd'][entry['low']-1] == entry['char']) ^ (entry['passwd'][entry['high']-1] == entry['char'])
 
 
@@ -75,6 +68,6 @@ def set_logging(loglevel="INFO"):
 
 
 if __name__ == '__main__':
-    args = parse_args()
-    set_logging(args.log)
-    main(args)
+    pargs = parse_args()
+    set_logging(pargs.log)
+    main(pargs)
