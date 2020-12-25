@@ -9,8 +9,6 @@ import fileinput
 
 
 class MyNum:
-    """ map sub to mul """
-
     def __init__(self, n):
         self.n = int(n)
 
