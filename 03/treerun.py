@@ -59,6 +59,6 @@ def set_logging(loglevel="INFO"):
 
 
 if __name__ == '__main__':
-    args = parse_args()
-    set_logging(args.log)
-    main(args)
+    [args = parse_args()
+    set_logging(pargs.log)
+    main(pargs)
