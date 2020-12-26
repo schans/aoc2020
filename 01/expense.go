@@ -9,16 +9,14 @@ import (
 )
 
 func main() {
+	var v1, v2, v3 int
+	c := map[int]bool{}
+
 	if len(os.Args) < 2 {
 		log.Fatal("Specify input file")
 	}
-
 	s := readFile(os.Args[1])
 	fmt.Printf("%v\n", s)
-
-	c := map[int]bool{}
-
-	var v1, v2, v3 int
 
 	for _, v := range s {
 		n, err := strconv.Atoi(v)
