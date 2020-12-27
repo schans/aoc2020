@@ -21,7 +21,6 @@ def is_valid(p) -> bool:
 
 for line in fileinput.input():
     if line.strip() == "":
-        print(p)
         if p.keys() - {'cid'} == {'ecl', 'pid', 'eyr', 'hcl', 'byr', 'iyr', 'hgt'}:
             c1 += 1
             if is_valid(p):
