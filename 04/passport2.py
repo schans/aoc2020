@@ -28,7 +28,6 @@ for line in fileinput.input():
         p.clear()
     else:
         for kv in line.strip().split(' '):
-            print(kv)
             (k, v) = kv.split(':')
             p[k] = v
 
