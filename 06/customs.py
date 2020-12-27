@@ -5,12 +5,6 @@ import logging
 import string
 
 
-def parse_seat(seat_str):
-    seat_bin = seat_str.strip().replace('F', '0').replace('B', '1').replace('L', '0').replace('R', '1')
-    logging.debug("Seat %s, %s, %s", seat_str.strip(), seat_bin, int(seat_bin, 2))
-    return int(seat_bin, 2)
-
-
 def init_set(mode):
     if mode == "diff":
         return set(string.ascii_lowercase)
