@@ -17,8 +17,8 @@ for line in fileinput.input():
         c1 = set()
         c2 = set(a2z)
     else:
-        c1 = c1 | set(line)
-        c2 = c2.intersection(set(line))
+        c1 |= set(line)
+        c2 &= set(line)
 
 print('p1', sum(G))
 print('p2', sum(H))
