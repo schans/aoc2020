@@ -5,7 +5,7 @@ import logging
 import re
 
 
-def parse_data(fp):
+def parse_data(fp, v2=True):
     fp.seek(0, 0)
     lines = [line.strip() for line in fp.readlines()]
     rules = dict()
@@ -18,10 +18,21 @@ def parse_data(fp):
         if head:
             p = line.split(': ')
             rules[int(p[0])] = p[1].replace('"', '').split(' ')
+            # if v2:
+            #     if p[0] == '8':
+            #         rules[int(p[0])] += ['|', '42', '8']
+            #     elif p[0] == '11':
+            #         rules[int(p[0])] += ['|', '42', '11', '31']
         else:
             msgs.add(line)
 
     return rules, msgs
+
+
+def update_rules_part2(rules):
+    rules[8] += ['|', '42', '8']
+    rules[11] += ['|', '42', '11', '31']
+    return rules
 
 
 def build_regex(rules):
@@ -34,7 +45,7 @@ def get_expr(rules, idx):
     # logging.debug("Parse rule %d: '%s'", idx, rules[idx])
     looped = None
     if str(idx) in rules[idx]:
-        unlooped = rules[idx][0:rules[idx].index('|')]
+        unlooped = rules[idx][0: rules[idx].index('|')]
         looped = rules[idx][rules[idx].index('|')+1:]
         rules[idx] = unlooped
 
@@ -55,7 +66,7 @@ def get_expr(rules, idx):
             for i, rn in enumerate(rules[idx]):
                 if rn == str(idx):
                     rules[idx][i] = 'L' + rn
-            #print(get_expr(rules, idx))
+            # print(get_expr(rules, idx))
             r += get_expr(rules, int(n))
         else:
             r += get_expr(rules, int(n))
@@ -95,7 +106,14 @@ def match_count(msgs, r):
 
 
 def main(args):
-    rules, msgs = parse_data(args.data)
+    logging.info("Part 1")
+    rules, msgs = parse_data(args.data, False)
+    logging.info("Num rules:%d, msgs:%d", len(rules), len(msgs))
+    r = build_regex(rules)
+    logging.info("Numner of matching rules: %d", match_count(msgs, r))
+
+    logging.info("Part 2")
+    rules = update_rules_part2(rules)
     logging.info("Num rules:%d, msgs:%d", len(rules), len(msgs))
     r = build_regex(rules)
     logging.info("Numner of matching rules: %d", match_count(msgs, r))
