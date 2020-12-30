@@ -15,24 +15,22 @@ for l in fileinput.input():
         n, expr = l.split(': ')
         r[n] = list()
         for p in expr.split(' | '):
-            p.replace('"', '')
             r[n].append([x.replace('"', '').strip() for x in p.split(' ')])
     else:
-        if not l.startswith('#'):
-            t.append(l)
+        t.append(l)
 
 
 def consume(l, n):
     # string is consumed but rules left
     if not l or len(l) == 0:
-        return {'E'}, False
+        return {}, False
 
     # tail
     if r[n][0][0] in ["a", "b"]:
         if r[n][0][0] == l[0]:
             return {l[1:]}, True
         else:
-            return {'F'}, False
+            return {}, False
 
     matches = set()
     ruleset_match = False
@@ -56,7 +54,7 @@ def match_ruleset(ruleset, l):
 
         matches = submatches
         if len(matches) == 0:
-            return {'F'}, False
+            return {}, False
     return matches, True
 
 
