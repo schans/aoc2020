@@ -61,6 +61,7 @@ def match_ruleset(ruleset, l):
 
 
 def count_matches():
+    consume.cache_clear()
     s = 0
     for l in t:
         res, match = consume(l, '0')
@@ -80,6 +81,5 @@ print(f'Part 1, matches: {s}')
 r['8'].append(['42', '8'])
 r['11'].append(['42', '11', '31'])
 
-consume.cache_clear()
 s = count_matches()
 print(f'Part 2, matches: {s}')
