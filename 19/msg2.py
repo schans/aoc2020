@@ -25,24 +25,21 @@ for l in fileinput.input():
 def consume(l, n):
     # string is consumed but rules left
     if not l or len(l) == 0:
-        return {}, False
+        return set()
 
     # tail
     if r[n][0][0] in ["a", "b"]:
         if r[n][0][0] == l[0]:
-            return {l[1:]}, True
+            return {l[1:]}
         else:
-            return {}, False
+            return set()
 
     matches = set()
-    ruleset_match = False
     for ruleset in r[n]:
-        left, match = match_ruleset(ruleset, l)
-        if match:
-            matches |= left
-            ruleset_match = True
+        left = match_ruleset(ruleset, l)
+        matches |= left
 
-    return matches, ruleset_match
+    return matches
 
 
 def match_ruleset(ruleset, l):
@@ -50,26 +47,24 @@ def match_ruleset(ruleset, l):
     for rule in ruleset:
         submatches = set()
         for m in matches:
-            left, match = consume(m, rule)
-            if match:
-                submatches |= left
+            left = consume(m, rule)
+            submatches |= left
 
         matches = submatches
         if len(matches) == 0:
-            return {}, False
-    return matches, True
+            return set()
+    return matches
 
 
 def count_matches():
     consume.cache_clear()
     s = 0
     for l in t:
-        res, match = consume(l, '0')
-        if match == True:
-            for x in res:
-                if x == '':
-                    # print('MATCH', l)
-                    s += 1
+        res = consume(l, '0')
+        for x in res:
+            if x == '':
+                # print('MATCH', l)
+                s += 1
     return s
 
 
