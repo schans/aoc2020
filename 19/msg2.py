@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import fileinput
+from functools import lru_cache
 
 r = dict()  # rules
 t = list()  # patterns
@@ -20,6 +21,7 @@ for l in fileinput.input():
         t.append(l)
 
 
+@lru_cache(maxsize=100000)
 def consume(l, n):
     # string is consumed but rules left
     if not l or len(l) == 0:
@@ -78,5 +80,6 @@ print(f'Part 1, matches: {s}')
 r['8'].append(['42', '8'])
 r['11'].append(['42', '11', '31'])
 
+consume.cache_clear()
 s = count_matches()
 print(f'Part 2, matches: {s}')
