@@ -16,7 +16,6 @@ func main() {
 		log.Fatal("Specify input file")
 	}
 	s := readFile(os.Args[1])
-	fmt.Printf("%v\n", s)
 
 	for _, v := range s {
 		n, err := strconv.Atoi(v)
@@ -37,13 +36,13 @@ func main() {
 		}
 	}
 
-	fmt.Printf("v1: %d\n", 2020-v1)
-	fmt.Printf("v2: %d\n", 2020-v2-v3)
+	fmt.Printf("v1: %d\n", v1*(2020-v1))
+	fmt.Printf("v2: %d\n", v2*v3*(2020-v2-v3))
 }
 
 func readFile(fileName string) []string {
 	var s []string
-	file, err := os.Open("test.data")
+	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
