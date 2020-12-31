@@ -34,37 +34,27 @@ def consume(l, n):
         else:
             return set()
 
-    matches = set()
+    rule_matches = set()
+    matches = list()
+    submatches = set()
+
     for ruleset in r[n]:
-        left = match_ruleset(ruleset, l)
-        matches |= left
-
-    return matches
-
-
-def match_ruleset(ruleset, l):
-    matches = [l]
-    for rule in ruleset:
-        submatches = set()
-        for m in matches:
-            left = consume(m, rule)
-            submatches |= left
-
-        matches = submatches
-        if len(matches) == 0:
-            return set()
-    return matches
+        matches = [l]
+        for rule in ruleset:
+            submatches = set()
+            for m in matches:
+                submatches |= consume(m, rule)
+            matches = submatches
+        rule_matches |= matches
+    return rule_matches
 
 
 def count_matches():
     consume.cache_clear()
     s = 0
     for l in t:
-        res = consume(l, '0')
-        for x in res:
-            if x == '':
-                # print('MATCH', l)
-                s += 1
+        if '' in consume(l, '0'):
+            s += 1
     return s
 
 
