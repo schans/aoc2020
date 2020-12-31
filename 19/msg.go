@@ -11,7 +11,13 @@ import (
 
 // Rule contains one or more rulesets
 type Rule struct {
-	ruleSets []RuleSet
+	ruleSets []*RuleSet
+}
+
+// NewRule create new RuleSet
+func NewRule() *Rule {
+	ruleSets := make([]*RuleSet, 0, 2)
+	return &Rule{ruleSets}
 }
 
 // RuleSet contains set of rules
@@ -19,31 +25,30 @@ type RuleSet struct {
 	rules []string
 }
 
-var rules map[string]Rule
+// NewRuleSet create new RuleSet
+func NewRuleSet(rules []string) *RuleSet {
+	return &RuleSet{rules}
+}
+
+// AddRuleSet add RuleSet to Rule
+func (rule *Rule) AddRuleSet(ruleSet *RuleSet) {
+	rule.ruleSets = append(rule.ruleSets, ruleSet)
+}
+
+var rules map[string]*Rule
 var msgs []string
 var cache sync.Map
 
-// AddRuleSet add RuleSet to Rule
-func (rule *Rule) AddRuleSet(ruleSet RuleSet) []RuleSet {
-	rule.ruleSets = append(rule.ruleSets, ruleSet)
-	return rule.ruleSets
-}
-
 func main() {
-	rules = make(map[string]Rule)
+	rules = make(map[string]*Rule)
 	lines := readFile(os.Args)
 	parse(lines)
 
 	fmt.Printf("Messages: %d\n", len(msgs))
 	fmt.Printf("Part 1: %d\n", countMatches())
 
-	// update rules
-	rule := rules["8"]
-	rule.AddRuleSet(RuleSet{[]string{"42", "8"}})
-	rules["8"] = rule
-	rule = rules["11"]
-	rule.AddRuleSet(RuleSet{[]string{"42", "11", "31"}})
-	rules["11"] = rule
+	rules["8"].AddRuleSet(NewRuleSet([]string{"42", "8"}))
+	rules["11"].AddRuleSet(NewRuleSet([]string{"42", "11", "31"}))
 
 	cache = sync.Map{}
 	fmt.Printf("Part 2: %d\n", countMatches())
@@ -52,6 +57,7 @@ func main() {
 func countMatches() int {
 	cnt := 0
 	c := make(chan map[string]bool, len(msgs))
+	// c := make(chan map[string]bool, 16)
 
 	// run
 	for _, msg := range msgs {
@@ -99,10 +105,8 @@ func consume(msg string, n string, c chan map[string]bool) {
 
 	for _, ruleSet := range rules[n].ruleSets {
 		rests := matchRuleSet(ruleSet, msg)
-		if len(rests) > 0 {
-			for rest := range rests {
-				matches[rest] = true
-			}
+		for rest := range rests {
+			matches[rest] = true
 		}
 	}
 
@@ -110,7 +114,7 @@ func consume(msg string, n string, c chan map[string]bool) {
 	c <- matches
 }
 
-func matchRuleSet(ruleSet RuleSet, line string) map[string]bool {
+func matchRuleSet(ruleSet *RuleSet, line string) map[string]bool {
 	matches := make(map[string]bool)
 	matches[line] = true
 
@@ -125,10 +129,8 @@ func matchRuleSet(ruleSet RuleSet, line string) map[string]bool {
 		// collect
 		for range matches {
 			rests := <-c
-			if len(rests) > 0 {
-				for rest := range rests {
-					subMatches[rest] = true
-				}
+			for rest := range rests {
+				subMatches[rest] = true
 			}
 		}
 
@@ -148,16 +150,16 @@ func parse(lines []string) {
 			continue
 		}
 		if head {
-			ruleSets := make([]RuleSet, 0, 2)
+			rule := NewRule()
 			lparts := strings.Split(line, ": ")
 			rparts := strings.Split((lparts[1]), " | ")
 			for _, rpart := range rparts {
 				rpart = strings.Trim(rpart, " ")
 				rpart = strings.Trim(rpart, "\"")
-				ruleSet := RuleSet{strings.Split(rpart, " ")}
-				ruleSets = append(ruleSets, ruleSet)
+				ruleSet := NewRuleSet(strings.Split(rpart, " "))
+				rule.AddRuleSet(ruleSet)
 			}
-			rules[lparts[0]] = Rule{ruleSets}
+			rules[lparts[0]] = rule
 		} else {
 			msgs = append(msgs, line)
 		}
