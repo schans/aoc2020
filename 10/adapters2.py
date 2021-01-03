@@ -3,12 +3,7 @@
 import fileinput
 from functools import lru_cache
 
-A = list()
-
 A = [int(l) for l in fileinput.input()]
-# for l in fileinput.input():
-#     A.append(int(l))
-
 A.append(0)
 A.append(max(A)+3)
 A.sort()
